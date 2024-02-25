@@ -11,5 +11,5 @@ public interface DiceRollAndPlayService {
     /**
      * Roll dice int.
      */
-    void rollDice(Map<String, Player> players );
+    void rollDice(Map<String, Player> players);
 }

@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 /**
  * The type Player.
@@ -28,13 +30,14 @@ public class Player {
      */
     @NonNull
     @NotBlank(message = "Should be player name")
+    @NotEmpty(message = "Should be player name")
     @JsonProperty("name")
     private String name;
     /**
      * The Age.
      */
     @NonNull
-    @NotBlank(message = "Should be player age")
+    @Min(value = 5, message = "Player age should greater than 5")
     @JsonProperty("age")
     private Integer age;
     /**

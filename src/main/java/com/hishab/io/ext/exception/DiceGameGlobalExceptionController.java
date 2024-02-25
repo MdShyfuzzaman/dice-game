@@ -57,4 +57,18 @@ public class DiceGameGlobalExceptionController {
         log.warn(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase(), e);
         return ResponseEntity.badRequest().body(HttpStatus.UNSUPPORTED_MEDIA_TYPE.getReasonPhrase());
     }
+
+    /**
+     * Handle content type supported response entity.
+     *
+     * @param e the e
+     * @return the response entity
+     */
+    @ExceptionHandler(javax.validation.UnexpectedTypeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<String> handleContentTypeSupported(javax.validation.UnexpectedTypeException e) {
+        log.warn(HttpStatus.BAD_REQUEST.getReasonPhrase(), e);
+        return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST.getReasonPhrase());
+    }
 }

@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * The type Game controller.
@@ -37,6 +39,7 @@ public class GameController {
      * The Player repository.
      */
     private final PlayerRepository playerRepository;
+
     @GetMapping("/start")
     public ResponseEntity<String> newGame() {
         playerRepository.resetPlayer();
@@ -50,7 +53,7 @@ public class GameController {
      * @param player the player
      * @return the response entity
      */
-    @PostMapping("/create/player")
+    @PostMapping(value = "/create/player", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createPlayer(@RequestBody @Valid Player player) {
         if (playerRepository.getTotalActivePlayer() >= DiceGameConstant.MAX_PLAYER_ALLOWED) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Maximum players limit reached");
@@ -93,7 +96,11 @@ public class GameController {
      */
     @GetMapping("/winner")
     public ResponseEntity<String> getWinner() {
-        Optional<String> firstKey = Objects.requireNonNull(getPlayersScores()).keySet().stream().findFirst();
+        int max = Collections.max(getPlayersScores().values());
+        Optional<String> firstKey = getPlayersScores().entrySet().stream()
+                .filter(e -> e.getValue() == max)
+                .map(Map.Entry::getKey)
+                .findFirst();
         return firstKey.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.ok("No Scorer Found!!!"));
     }
 

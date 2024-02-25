@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 /**
  * The type Dice service.
@@ -32,7 +33,10 @@ public class DiceRollAndPlayServiceImpl implements DiceRollAndPlayService {
      * The Game config.
      */
     private final GameConfig gameConfig;
-
+    /**
+     * The Random.
+     */
+    private final Random random = new Random();
     /**
      * The Inner url.
      */
@@ -124,8 +128,17 @@ public class DiceRollAndPlayServiceImpl implements DiceRollAndPlayService {
      * @return the dice rolling value
      */
     private int getDiceRollingValue() {
-        ResponseEntity<Integer> response = restTemplate.getForEntity(innerUrl, Integer.class);
-        return response.getBody() == null ? 0 : response.getBody();
+        try {
+            ResponseEntity<Integer> response = restTemplate.getForEntity(innerUrl, Integer.class);
+            if (response.getBody() == null) { // If inner API not found then create random dice value
+                // Generate a random number between 1 and 6 (inclusive)
+                return random.nextInt(6) + 1;
+            }
+            return response.getBody();
+        } catch (Exception e) {
+            log.error("Inner API Exception : {}", e.getMessage());
+            return random.nextInt(6) + 1;// If inner API not found then generate random dice value
+        }
     }
 
 }

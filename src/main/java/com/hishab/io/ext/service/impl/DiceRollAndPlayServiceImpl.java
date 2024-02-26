@@ -1,6 +1,7 @@
 package com.hishab.io.ext.service.impl;
 
 import com.hishab.io.ext.config.GameConfig;
+import com.hishab.io.ext.exception.DiceGameAPIException;
 import com.hishab.io.ext.model.Player;
 import com.hishab.io.ext.service.DiceRollAndPlayService;
 import lombok.RequiredArgsConstructor;
@@ -108,6 +109,7 @@ public class DiceRollAndPlayServiceImpl implements DiceRollAndPlayService {
             log.info("End Playing game");
         } catch (Exception e) {
             log.error("Exception while paling game", e);
+            throw new DiceGameAPIException("Exception while paling game");
         }
     }
 

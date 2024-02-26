@@ -21,8 +21,9 @@ public class PlayerRepository {
      *
      * @param player the player
      */
-    public void savePlayer(Player player) {
+    public Player savePlayer(Player player) {
         players.put(player.getName(), player);
+        return player;
     }
 
     /**

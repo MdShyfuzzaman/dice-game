@@ -1,8 +1,8 @@
 package com.hishab.io.ext.entrypoint;
 
 import com.hishab.io.ext.model.Player;
-import com.hishab.io.ext.repository.PlayerRepository;
 import com.hishab.io.ext.service.DiceRollAndPlayService;
+import com.hishab.io.ext.service.PlayerService;
 import com.hishab.io.ext.support.DiceGameConstant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,13 +36,19 @@ public class GameController {
     private final DiceRollAndPlayService diceRollAndPlayService;
 
     /**
-     * The Player repository.
+     * The Player service.
      */
-    private final PlayerRepository playerRepository;
+    private final PlayerService playerService;
 
+    /**
+     * New game response entity.
+     *
+     * @return the response entity
+     */
     @GetMapping("/start")
     public ResponseEntity<String> newGame() {
-        playerRepository.resetPlayer();
+        playerService.resetPlayer();
+        log.info("Reset the game. You can start a new game by creating players");
         return ResponseEntity.ok("Now Create Players!!!");
     }
 
@@ -55,11 +61,13 @@ public class GameController {
      */
     @PostMapping(value = "/create/player", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createPlayer(@RequestBody @Valid Player player) {
-        if (playerRepository.getTotalActivePlayer() >= DiceGameConstant.MAX_PLAYER_ALLOWED) {
+        if (playerService.getTotalActivePlayer() >= DiceGameConstant.MAX_PLAYER_ALLOWED) {
+            log.warn("Maximum players limit reached");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Maximum players limit reached");
         }
-        playerRepository.savePlayer(player);
-        return ResponseEntity.ok("Player created successfully!!!");
+        playerService.createPlayer(player);
+        log.info("Player created successfully!!! {}", player);
+        return ResponseEntity.ok("Player created successfully!!!" + player);
     }
 
     /**
@@ -69,13 +77,14 @@ public class GameController {
      */
     @PostMapping("/play/game")
     public ResponseEntity<String> startGame() {
-        if (playerRepository.getTotalActivePlayer() < DiceGameConstant.MIN_PLAYER_REQUIRED) {
+        if (playerService.getTotalActivePlayer() < DiceGameConstant.MIN_PLAYER_REQUIRED) {
+            log.warn("Minimum 2 players required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Minimum 2 players required");
         }
         // Game logic
-        diceRollAndPlayService.rollDice(playerRepository.getActivePlayer());
-
-        return ResponseEntity.ok("Game Finish!!! Attendant players are : " + playerRepository.getActivePlayer());
+        diceRollAndPlayService.rollDice(playerService.getActivePlayer());
+        log.info("Game Finish!!! Attendant players are : {} " ,playerService.getActivePlayer());
+        return ResponseEntity.ok("Game Finish!!! Attendant players are : " + playerService.getActivePlayer());
     }
 
     /**
@@ -111,7 +120,7 @@ public class GameController {
      */
     private Map<String, Integer> getPlayersScores() {
         Map<String, Integer> scores = new HashMap<>();
-        for (Player player : playerRepository.getActivePlayer().values()) {
+        for (Player player : playerService.getActivePlayer().values()) {
             scores.put(player.getName(), player.getTotalScore());
         }
         return scores;

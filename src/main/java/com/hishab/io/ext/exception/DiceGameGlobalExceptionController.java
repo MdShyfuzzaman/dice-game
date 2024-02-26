@@ -11,23 +11,24 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
- * The type Dice game exception advice controller.
+ * The type Dice game global exception controller.
  */
 @ControllerAdvice
 @Slf4j
 public class DiceGameGlobalExceptionController {
+
     /**
      * Handle api exception response entity.
      *
      * @param e the e
      * @return the response entity
      */
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(value = DiceGameAPIException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<String> handleApiException(Exception e) {
-        log.error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e);
-        return ResponseEntity.internalServerError().build();
+    public ResponseEntity<String> handleApiException(DiceGameAPIException e) {
+        log.warn("{}", e.getErrorMessage());
+        return ResponseEntity.badRequest().body(e.getErrorMessage());
     }
 
     /**
@@ -71,4 +72,19 @@ public class DiceGameGlobalExceptionController {
         log.warn(HttpStatus.BAD_REQUEST.getReasonPhrase(), e);
         return ResponseEntity.badRequest().body(HttpStatus.BAD_REQUEST.getReasonPhrase());
     }
+
+    /**
+     * Handle api system exception response entity.
+     *
+     * @param e the e
+     * @return the response entity
+     */
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleApiSystemException(Exception e) {
+        log.error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e);
+        return ResponseEntity.internalServerError().build();
+    }
+
 }

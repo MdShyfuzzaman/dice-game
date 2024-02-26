@@ -15,7 +15,7 @@ public interface PlayerService {
      *
      * @param player the player
      */
-    void createPlayer(Player player);
+    Player createPlayer(Player player);
 
     /**
      * Reset player.

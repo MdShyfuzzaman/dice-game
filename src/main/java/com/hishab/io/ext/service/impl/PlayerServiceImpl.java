@@ -29,9 +29,9 @@ public class PlayerServiceImpl implements PlayerService {
      * @param player the player
      */
     @Override
-    public void createPlayer(Player player) {
+    public Player createPlayer(Player player) {
         try {
-            playerRepository.savePlayer(player);
+            return playerRepository.savePlayer(player);
         } catch (Exception e) {
             throw new DiceGameAPIException("Error during player creation");
         }

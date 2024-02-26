@@ -26,6 +26,6 @@ public class GameConfig {
     /**
      * The Winning score.
      */
-    @Value("${dice.game.winning-score}")
+    @Value("${dice.game.winning-score:26}")
     public int winningScore;
 }

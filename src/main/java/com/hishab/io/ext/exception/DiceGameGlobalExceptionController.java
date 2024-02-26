@@ -84,7 +84,7 @@ public class DiceGameGlobalExceptionController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<String> handleApiSystemException(Exception e) {
         log.error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(), e);
-        return ResponseEntity.internalServerError().build();
+        return ResponseEntity.internalServerError().body(e.getMessage());
     }
 
 }

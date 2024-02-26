@@ -48,6 +48,7 @@ public class GameController {
     @GetMapping("/start")
     public ResponseEntity<String> newGame() {
         playerService.resetPlayer();
+        log.info("Reset the game. You can start a new game by creating players");
         return ResponseEntity.ok("Now Create Players!!!");
     }
 
@@ -61,10 +62,12 @@ public class GameController {
     @PostMapping(value = "/create/player", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> createPlayer(@RequestBody @Valid Player player) {
         if (playerService.getTotalActivePlayer() >= DiceGameConstant.MAX_PLAYER_ALLOWED) {
+            log.warn("Maximum players limit reached");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Maximum players limit reached");
         }
         playerService.createPlayer(player);
-        return ResponseEntity.ok("Player created successfully!!!");
+        log.info("Player created successfully!!! {}", player);
+        return ResponseEntity.ok("Player created successfully!!!" + player);
     }
 
     /**
@@ -75,11 +78,12 @@ public class GameController {
     @PostMapping("/play/game")
     public ResponseEntity<String> startGame() {
         if (playerService.getTotalActivePlayer() < DiceGameConstant.MIN_PLAYER_REQUIRED) {
+            log.warn("Minimum 2 players required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Minimum 2 players required");
         }
         // Game logic
         diceRollAndPlayService.rollDice(playerService.getActivePlayer());
-
+        log.info("Game Finish!!! Attendant players are : {} " ,playerService.getActivePlayer());
         return ResponseEntity.ok("Game Finish!!! Attendant players are : " + playerService.getActivePlayer());
     }
 

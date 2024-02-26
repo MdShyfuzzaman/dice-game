@@ -1,44 +1,42 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-    <property name="LOGS" value="./logs" />
-
-    <appender name="Console"
-              class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg %n %throwable
-            </Pattern>
-        </layout>
-    </appender>
-
-    <appender name="RollingFile"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/dice_game.log</file>
-        <encoder
-                class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
-        </encoder>
-
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOGS}/archived/dice_game-%d{yyyy-MM-dd}.%i.log
-            </fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy
-                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <maxHistory>7</maxHistory>
+    <conversionRule conversionWord="stacktrace"
+                    converterClass="net.logstash.logback.stacktrace.ShortenedThrowableConverter"/>
+    <appender name="app_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO,WARN</level>
+        </filter>
+        <file>logs/dice_game.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/dice_game_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>6MB</maxFileSize>
+            <totalSizeCap>60MB</totalSizeCap>
+            <maxHistory>30</maxHistory>
         </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy/MMM/dd HH:mm:ss} [HostName] ${HOSTNAME} [%p][%logger{36}-%M:%L] - %msg%n</pattern>
+        </encoder>
     </appender>
-
-    <root level="INFO">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
+    <appender name="app_error_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>logs/dice_game_error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/dice_game_error_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>6MB</maxFileSize>
+            <totalSizeCap>60MB</totalSizeCap>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%d{yyyy/MMM/dd HH:mm:ss} [HostName] ${HOSTNAME} [%p][%logger{36}-%M:%L] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <root level="DEBUG">
+        <appender-ref ref="app_log"/>
+        <appender-ref ref="app_error_log"/>
     </root>
-
-    <logger name="com.hishab.io.ext" level="DEBUG" additivity="false">
-        <appender-ref ref="RollingFile" />
-        <appender-ref ref="Console" />
-    </logger>
-
 </configuration>
